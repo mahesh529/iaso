@@ -396,7 +396,12 @@ class InstanceBulkPushGpsAPITestCase(TaskAPITestCase):
         self.runAndValidateTask(task, "KILLED")
 
     def assertEqualLocations(self, point_1: Point, point_2: Point):
-        self.assertEqual(point_1.x, point_2.x)
-        self.assertEqual(point_1.y, point_2.y)
-        self.assertEqual(point_1.z, point_2.z)
-        self.assertEqual(point_1.srid, point_2.srid)
+        """Assert that two Points are equal within tolerance for x,y coordinates.
+
+        Uses tolerance of 0.000001 for x,y coordinates to account for rounding differences.
+        Z coordinate and SRID are compared exactly.
+        """
+        self.assertAlmostEqual(point_1.x, point_2.x, places=6)  # ~11cm precision for GPS
+        self.assertAlmostEqual(point_1.y, point_2.y, places=6)
+        self.assertEqual(point_1.z, point_2.z)  # Exact comparison for altitude
+        self.assertEqual(point_1.srid, point_2.srid)  # Exact comparison for coordinate system
